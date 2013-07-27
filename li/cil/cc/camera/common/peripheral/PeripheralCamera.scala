@@ -160,6 +160,15 @@ class PeripheralCamera(val context: IPeripheralContext, val isTurtle: Boolean) e
     val noiseFromCooldown = 5.0 // Fixed, large value.
     val cooldownInducedNoise = relativeCooldownRemaining * noiseFromCooldown
 
+    // Play a sound effect when we're triggered, if we're allowed to.
+    if (Camera.Config.enableSound)
+      if (relativeCooldownRemaining <= 0)
+        // No cooldown remaining, play success sound (deeper click sound).
+        context.world.playAuxSFX(1000, context.x, context.y, context.z, 0)
+      else if (relativeCooldownRemaining < 1)
+        // Cooldown remaining and wasn't spammed, play failure sound (lighter click sound).
+        context.world.playAuxSFX(1001, context.x, context.y, context.z, 0)
+
     // Set our last trigger time to enforce cooldown based noise for future calls.
     lastTrigger = context.world.getTotalWorldTime()
 

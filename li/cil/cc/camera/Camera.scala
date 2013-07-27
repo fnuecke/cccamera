@@ -34,6 +34,7 @@ object Camera {
     var hashSalt = "if you run a public server you may want to change this"
     var minLightLevel = 6.0
     var cooldown = 1.0
+    var enableSound = true
     var hasSHA512 = true
   }
 
@@ -86,6 +87,12 @@ object Camera {
       "determine the true signature of a block. The minimum value is 0.1 to at\n" +
       "least discourage spamming it in a single tick.").
       getDouble(Config.cooldown) max 0.1
+
+    Config.enableSound = config.get("options", "enableSound", Config.enableSound,
+      "Whether to play a clicking sound when the camera is triggered.\n" +
+        "This can be useful because the sound when the camera is still on cooldown\n" +
+        "is different than the one from when it isn't.").
+      getBoolean(Config.enableSound)
 
     config.save()
 
