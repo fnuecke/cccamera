@@ -34,10 +34,10 @@ trait IPeripheralContext {
   def facing: ForgeDirection
 
   /** Called when turtles use the flash. */
-  def consumeFuel(): Unit
+  def consumeFuel(): Boolean
 }
 
-class PeripheralCamera(val context: IPeripheralContext, val isTurtle: Boolean) extends IHostedPeripheral {
+class PeripheralCamera(val context: IPeripheralContext) extends IHostedPeripheral {
   // ----------------------------------------------------------------------- //
   // General
   // ----------------------------------------------------------------------- //
@@ -131,10 +131,10 @@ class PeripheralCamera(val context: IPeripheralContext, val isTurtle: Boolean) e
     // specified. Let's hope this really ever only returns values in [0, 15].
     val maxLightLevel = 15
     val lightLevel =
-      if (isTurtle && flash) {
-        context.consumeFuel()
+      if (flash && context.consumeFuel())
         maxLightLevel
-      } else context.world.getBlockLightValue(context.x, context.y, context.z)
+      else
+        context.world.getBlockLightValue(context.x, context.y, context.z)
 
     // Adjust the light level to a range of [0, 1], to apply it to the original data.
     val lightScale = lightLevel / 15.0

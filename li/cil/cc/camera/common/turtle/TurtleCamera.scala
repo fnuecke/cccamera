@@ -29,7 +29,7 @@ object TurtleCamera extends ITurtleUpgrade {
   def isSecret = false
 
   def createPeripheral(turtle: ITurtleAccess, side: TurtleSide) =
-    new PeripheralCamera(new TurtleContext(turtle, side), true)
+    new PeripheralCamera(new TurtleContext(turtle, side))
 
   def useTool(turtle: ITurtleAccess, side: TurtleSide, verb: TurtleVerb, direction: Int) = false
 

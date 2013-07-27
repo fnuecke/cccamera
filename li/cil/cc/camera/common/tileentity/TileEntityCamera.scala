@@ -24,7 +24,7 @@ class TileEntityCamera extends TileEntity with IPeripheral with IPeripheralConte
   // General
   // ----------------------------------------------------------------------- //
 
-  private val peripheral = new PeripheralCamera(this, false)
+  private val peripheral = new PeripheralCamera(this)
 
   override def readFromNBT(nbt: NBTTagCompound) = {
     super.readFromNBT(nbt)
@@ -67,6 +67,6 @@ class TileEntityCamera extends TileEntity with IPeripheral with IPeripheralConte
   /** Camera looks to the front of the block (where the front texture is). */
   def facing: ForgeDirection = ForgeDirection.getOrientation(Array(3, 2, 5, 4)(getBlockMetadata - 2)).getOpposite
 
-  /** Should never be called for blocks. */
-  def consumeFuel = throw new NotImplementedError
+  /** No can do! */
+  def consumeFuel() = false
 }
