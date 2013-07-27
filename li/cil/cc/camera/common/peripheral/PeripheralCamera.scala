@@ -177,7 +177,7 @@ class PeripheralCamera(val context: IPeripheralContext) extends IHostedPeriphera
     val minimalNoise = 0.1
     val noise = Math.max(generalNoise + cooldownInducedNoise, minimalNoise)
 
-    // Box the values to get an object array and return it. Also apply noise if any.
+    // Box the values to get an object array and return it.
     signature map (_ + context.world.rand.nextGaussian() * noise) map double2Double toArray
   }
 }
