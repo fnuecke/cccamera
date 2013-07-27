@@ -69,9 +69,19 @@ So I set out to make up some limitations that felt natural and intuitive in the 
 
 I tried breaking this down to some relatively intuitive settings. Have a look at the config file, it'll contain comments with explanations.
 
+Plans
+=====
+
+All of these may or may not happen.
+
+- Make the camera block wrenchable.
+- Add some particle / lighting effect when the flash is used.
+- Create a nicer block model.
+- Inspect items in a turtle's inventory if and only if it is standing directly in front of a camera block (or next to another turtle with the camera upgrade).
+
 Acknowledgements
 ================
-I'm really grateful for [OpenCCSensors][] being open source. Since this is first proper mod for Minecraft that was a *huge* help in figuring out how all the different components work together.
+I'm really grateful for [OpenCCSensors][] being open source. Since this is my first proper mod for Minecraft that was a *huge* help in figuring out how all the different components work together.
 
 License
 =======
