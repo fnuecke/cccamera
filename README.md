@@ -76,7 +76,7 @@ I'm really grateful for [OpenCCSensors][] being open source. Since this is first
 License
 =======
 
-This API is licensed under the [MIT License][license], which basically means you can do with it as you please.
+This mod is licensed under the [MIT License][license], which basically means you can do with it as you please.
 
 [computercraft]: http://www.computercraft.info/
 [license]: http://opensource.org/licenses/mit-license.php
