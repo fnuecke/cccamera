@@ -20,7 +20,7 @@ import java.util.logging.Logger
 @Mod(modid = "CCCP",
   name = "ComputerCraft Camera Peripheral",
   version = "1.5.2.0",
-  //dependencies = "required-after:ComputerCraft",
+  dependencies = "required-after:ComputerCraft",
   modLanguage = "scala")
 @NetworkMod(clientSideRequired = true, serverSideRequired = false)
 object Camera {
@@ -32,10 +32,8 @@ object Camera {
     var cameraBlockID = 3600
     var turtleUpgradeID = 253
     var hashSalt = "if you run a public server you may want to change this"
-    var minLightLevel = 3
+    var minLightLevel = 6.0
     var cooldown = 1.0
-    var noiseFromCooldown = 2.0
-    var noiseBaseStrength = 0.5
     var hasSHA512 = true
   }
 
@@ -43,7 +41,9 @@ object Camera {
   logger.setParent(FMLLog.getLogger)
 
   /** No distinction for now. May come later if I decide to play with advanced rendering. */
-  @SidedProxy(clientSide = "li.cil.cc.camera.common.CommonProxy", serverSide = "li.cil.cc.camera.common.CommonProxy")
+  @SidedProxy(
+    clientSide = "li.cil.cc.camera.common.CommonProxy",
+    serverSide = "li.cil.cc.camera.common.CommonProxy")
   var proxy: CommonProxy = null
 
   @PreInit
@@ -57,47 +57,35 @@ object Camera {
     // Note: the pattern of having an empty string in the first line is to
     // make the auto formatter behave and evenly indent the following lines.
     Config.turtleUpgradeID = config.get("options", "turtleUpgradeID", Config.turtleUpgradeID,
-      "The ID for the turtle upgrade. Last I checked 253 was still available.").
+      "The ID for the turtle upgrade. Set this to -1 to disable the upgrade.").
       getInt(Config.turtleUpgradeID)
 
     Config.hashSalt = config.get("options", "hashSalt", Config.hashSalt, "" +
       "An additional salt to use for hashing block IDs.\n" +
       "This is applied in addition to the world seed and can be used on servers\n" +
       "to avoid clients generating hashes for block IDs by themselves, thereby\n" +
-      "circumventing the calibration of their computers.").
+      "circumventing the need to figure out the signatures via calibration.").
       getString()
 
     Config.minLightLevel = config.get("options", "minLightLevel", Config.minLightLevel, "" +
-      "This is the minimal light level required for a signature returned from\n" +
-      "a call to trigger() to actually carry any data. For light levels below\n" +
-      "this value the returned value will only be noise. Set this to zero to\n" +
-      "disable light levels influencing the quality of the returned signature.\n" +
-      "Turtles using the flash will have no effect and will not cost any fuel\n" +
-      "in that case.\n" +
-      "For any light level above and including the minimum the actual\n" +
-      "signature value will be dampened linearly the lower the light level,\n" +
-      "starting with identity scale of one at the maximum level down to zero\n" +
-      "at the light level one below the minimum light level.").
-      getInt(Config.minLightLevel) max 0 min 15
+      "If the light level is lower than this, the signature returned from a call\n" +
+      "to trigger() will, even in best conditions, contain more noise than data.\n" +
+      "Note that the 'power' of the true signature embedded in the returned value\n" +
+      "will decline linearly with the light level (this cannot be disabled, hack\n" +
+      "yourself an ID reading peripheral if you want that). That scaled data will\n" +
+      "then be overlayed with random (standard normal distributed) noise, to make\n" +
+      "figuring out the underlying signature and comparing single reads to that a\n" +
+      "bit more challenging." +
+      "Set this to zero to disable this constant base noise.").
+      getDouble(Config.minLightLevel) max 0
 
     Config.cooldown = config.get("options", "cooldown", Config.cooldown, "" +
       "The cooldown of a camera, i.e. how many seconds have to pass before taking\n" +
-      "a snapshot will not be penalized with additional noise.").
-      getDouble(Config.cooldown) max 0
-
-    Config.noiseFromCooldown = config.get("options", "noiseFromCooldown", Config.noiseFromCooldown, "" +
-      "The amount of noise cooldown introduces, which is added directly to\n" +
-      "the noise based on the light level. This will linearly decay over the\n" +
-      "cooldown period.").
-      getDouble(Config.noiseFromCooldown) max 0
-
-    Config.noiseBaseStrength = config.get("options", "noiseBaseStrength", Config.noiseBaseStrength, "" +
-      "Some base level of noise to add when taking snapshots, so that even in\n" +
-      "sunlight we won't get the same result all the time.\n" +
-      "Noise is applied by generating random numbers from a standard normal\n" +
-      "distribution, scaling them with the noise value and then adding that\n" +
-      "to the existing hash values, which are in the interval [-1,1].").
-      getDouble(Config.noiseBaseStrength) max 0
+      "another snapshot will not be penalized with additional noise. Used to make\n" +
+      "it infeasible to just call trigger() a bunch of times in a loop to\n" +
+      "determine the true signature of a block. The minimum value is 0.1 to at\n" +
+      "least discourage spamming it in a single tick.").
+      getDouble(Config.cooldown) max 0.1
 
     config.save()
 

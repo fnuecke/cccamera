@@ -104,37 +104,39 @@ class BlockCamera extends Block(Camera.Config.cameraBlockID, Material.rock) {
   // Debugging
   // ----------------------------------------------------------------------- //
 
-  override def onBlockActivated(world: World, x: Int, y: Int, z: Int,
-    player: net.minecraft.entity.player.EntityPlayer, side: Int,
-    hitX: Float, hitY: Float, hitZ: Float) = {
-    if (player.isSneaking()) {
-      false
-    } else {
-      if (!world.isRemote) {
-        val reps = 10
-        val tileEntity = world.getBlockTileEntity(x, y, z).asInstanceOf[TileEntityCamera]
-        val signatures = 1 to reps map (_ => tileEntity.callMethod(null, 0, null)(5).asInstanceOf[Double])
-        
-        val avg = (0.0 /: signatures)(_ + _) / reps
-        println("avg: ", avg)
-        
-        val delta = signatures map (_ - avg)
-        val absdelta = delta map Math.abs
-        val avgdelta = (0.0 /: absdelta)(_ + _) / reps
-        
-        println("min/max/avg delta: ", absdelta min, absdelta max, avgdelta)
-        
-
-        //val avg = signatures.map(_.getBytes("UTF-8")).foldLeft(Array.fill(64)(0))((a, b) => a zip b map (x => x._1 + x._2)) map (_ / 100) map (_.toChar)
-//        val avg = (Seq.fill(64)(0.0) /: signatures)((a, b) => a zip b map (x => x._1 + x._2)) map (_ / reps)
+//  override def onBlockActivated(world: World, x: Int, y: Int, z: Int,
+//    player: net.minecraft.entity.player.EntityPlayer, side: Int,
+//    hitX: Float, hitY: Float, hitZ: Float) = {
+//    if (player.isSneaking()) {
+//      false
+//    } else {
+//      if (!world.isRemote) {
+//        val reps = 64
+//        val tileEntity = world.getBlockTileEntity(x, y, z).asInstanceOf[TileEntityCamera]
+//        val signatures = 1 to reps map (_ => tileEntity.callMethod(null, 0, null)(43).asInstanceOf[Double])
+//        
+//        val avg = (0.0 /: signatures)(_ + _) / reps
+//        println("avg: ", avg)
+//        
+//        val delta = signatures map (_ - avg)
+//        val avgdelta = (0.0 /: delta)(_ + _) / reps
+//        val absdelta = delta map Math.abs
+//        val avgabsdelta = (0.0 /: absdelta)(_+_)/reps
+//        
+//        
+//        println("min/max/avg/avgabs delta: ", absdelta min, absdelta max, avgdelta, avgabsdelta)
+//        
 //
-//        val deltamaxs = (Seq.fill(64)(0.0) /: signatures)((a, b) => avg zip b map (x => Math.abs(x._1 - x._2)) zip a map (x => Math.max(x._1, x._2)))
-//        val deltaavgs = (Seq.fill(64)(0.0) /: signatures)((a, b) => avg zip b map (x => Math.abs(x._1 - x._2)) zip a map (x => x._1 + x._2)) map (_ / reps)
-//        println(deltaavgs.length)
-//        val deltaavg = (0.0 /: deltaavgs)(_ + _) / 64
-//        println("avg/min/max delta: ", deltaavg, deltamaxs min, deltamaxs max)
-      }
-      true
-    }
-  }
+//        //val avg = signatures.map(_.getBytes("UTF-8")).foldLeft(Array.fill(64)(0))((a, b) => a zip b map (x => x._1 + x._2)) map (_ / 100) map (_.toChar)
+////        val avg = (Seq.fill(64)(0.0) /: signatures)((a, b) => a zip b map (x => x._1 + x._2)) map (_ / reps)
+////
+////        val deltamaxs = (Seq.fill(64)(0.0) /: signatures)((a, b) => avg zip b map (x => Math.abs(x._1 - x._2)) zip a map (x => Math.max(x._1, x._2)))
+////        val deltaavgs = (Seq.fill(64)(0.0) /: signatures)((a, b) => avg zip b map (x => Math.abs(x._1 - x._2)) zip a map (x => x._1 + x._2)) map (_ / reps)
+////        println(deltaavgs.length)
+////        val deltaavg = (0.0 /: deltaavgs)(_ + _) / 64
+////        println("avg/min/max delta: ", deltaavg, deltamaxs min, deltamaxs max)
+//      }
+//      true
+//    }
+//  }
 }

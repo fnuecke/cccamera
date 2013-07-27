@@ -16,7 +16,9 @@ class CommonProxy {
   def init() = {
     Camera.Blocks.camera = new BlockCamera
     LanguageRegistry.addName(Camera.Blocks.camera, "Camera")
-    TurtleAPI.registerUpgrade(TurtleCamera)
+    if (Camera.Config.turtleUpgradeID > 0) {
+      TurtleAPI.registerUpgrade(TurtleCamera)
+    }
   }
 
   def postInit() = {

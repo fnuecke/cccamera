@@ -91,26 +91,6 @@ class PeripheralCamera(val context: IPeripheralContext, val isTurtle: Boolean) e
     // Return nothing (nil) when we're on the client side. Which should never happen.
     if (context.world.isRemote) return Array[Object]()
 
-    // Get the absolute light level at the camera's position. Apply flash if
-    // specified. Let's hope this really ever only returns values in [0, 15].
-    val lightScale =
-      if (Camera.Config.minLightLevel == 0) 1.0
-      else {
-        val maxLightLevel = 15
-        val lightLevel =
-          if (isTurtle && flash) {
-            context.consumeFuel()
-            maxLightLevel
-          } else context.world.getBlockLightValue(context.x, context.y, context.z)
-
-        // Adjust the light level to a range of [0, 1] based on our minimum light
-        // level, so that we can simply multiply it onto the data later on.
-        val minExclusiveLightLevel = Camera.Config.minLightLevel - 1.0
-        val adjustedLightLevel = Math.max(lightLevel - minExclusiveLightLevel, 0)
-        val adjustedMaxLightLevel = maxLightLevel - minExclusiveLightLevel
-        adjustedLightLevel / adjustedMaxLightLevel
-      }
-
     // Get the block ID and metadata of the block we're looking at.
     val dir = context.facing
     val (x, y, z) = (context.x + dir.offsetX, context.y + dir.offsetY, context.z + dir.offsetZ)
@@ -147,11 +127,29 @@ class PeripheralCamera(val context: IPeripheralContext, val isTurtle: Boolean) e
       }
     })
 
-    // Map the hash to the interval [-1,1] of type double, then scaled it based on the light level.
+    // Get the absolute light level at the camera's position. Apply flash if
+    // specified. Let's hope this really ever only returns values in [0, 15].
+    val maxLightLevel = 15
+    val lightLevel =
+      if (isTurtle && flash) {
+        context.consumeFuel()
+        maxLightLevel
+      } else context.world.getBlockLightValue(context.x, context.y, context.z)
+
+    // Adjust the light level to a range of [0, 1], to apply it to the original data.
+    val lightScale = lightLevel / 15.0
+
+    // Map the hash to the interval [-1,1] and scale it based on the light level.
     val signature = hash map {
       case x if x < 0 => x / 128.0
       case x => x / 127.0
     } map (_ * lightScale)
+
+    // Compute noise introduced from our minimum light level. Note that this value
+    // does in fact not change; we adjust the "power" of the true signal instead.
+    // I think it's more realistic that way (noise being constant, real image data
+    // goodness depending on light power that is).
+    val generalNoise = Camera.Config.minLightLevel / 15.0
 
     // Remaining relative cooldown, i.e. how far we're away from getting rid of
     // noise introduced from overuse, in percent. This is used to add some
@@ -159,18 +157,18 @@ class PeripheralCamera(val context: IPeripheralContext, val isTurtle: Boolean) e
     val cooldownInTicks = 20.0 * Camera.Config.cooldown
     val timePassed = context.world.getTotalWorldTime() - lastTrigger
     val relativeCooldownRemaining = Math.max(1 - timePassed / cooldownInTicks, 0)
-    val cooldownInducedNoise = relativeCooldownRemaining * Camera.Config.noiseFromCooldown
+    val noiseFromCooldown = 5.0 // Fixed, large value.
+    val cooldownInducedNoise = relativeCooldownRemaining * noiseFromCooldown
 
     // Set our last trigger time to enforce cooldown based noise for future calls.
     lastTrigger = context.world.getTotalWorldTime()
 
-    // Compute the complete noise scaling to be used on the random numbers.
-    val noise = Camera.Config.noiseBaseStrength + cooldownInducedNoise
+    // Compute the complete noise scaling to be used on the random numbers. We
+    // enforce some minimum noise to avoid making things too easy ;)
+    val minimalNoise = 0.1
+    val noise = Math.max(generalNoise + cooldownInducedNoise, minimalNoise)
 
     // Box the values to get an object array and return it. Also apply noise if any.
-    if (noise > 0.0001)
-      signature map (_ + context.world.rand.nextGaussian() * noise) map double2Double toArray
-    else
-      signature map double2Double toArray
+    signature map (_ + context.world.rand.nextGaussian() * noise) map double2Double toArray
   }
 }
