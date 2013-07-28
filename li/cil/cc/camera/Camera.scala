@@ -24,7 +24,7 @@ import net.minecraftforge.common.Configuration
 @Mod(modid = "CCCP",
   name = "ComputerCraft Camera Peripheral",
   version = "1.5.2.0",
-  dependencies = "required-after:ComputerCraft;after:BuildCraft",
+  dependencies = "required-after:Forge@[7.8.1.737,);required-after:ComputerCraft@[1.53,);after:BuildCraft",
   modLanguage = "scala")
 @NetworkMod(clientSideRequired = true, serverSideRequired = false,
   clientPacketHandlerSpec = new SidedPacketHandler(

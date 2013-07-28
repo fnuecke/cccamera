@@ -55,11 +55,11 @@ class PeripheralCamera(val context: IPeripheralContext) extends IHostedPeriphera
 
   def update() = {}
 
-  def readFromNBT(nbt: NBTTagCompound) = {
+  def readFromNBT(nbt: NBTTagCompound) {
     lastTrigger = nbt.getLong("lastTrigger")
   }
 
-  def writeToNBT(nbt: NBTTagCompound) = {
+  def writeToNBT(nbt: NBTTagCompound) {
     nbt.setLong("lastTrigger", lastTrigger)
   }
 
@@ -83,9 +83,9 @@ class PeripheralCamera(val context: IPeripheralContext) extends IHostedPeriphera
   /** Allow all sides in our unbound form. */
   def canAttachToSide(side: Int) = true
 
-  def attach(computer: IComputerAccess) = {}
+  def attach(computer: IComputerAccess) {}
 
-  def detach(computer: IComputerAccess) = {}
+  def detach(computer: IComputerAccess) {}
 
   // ----------------------------------------------------------------------- //
   // Logic
@@ -193,7 +193,7 @@ class PeripheralCamera(val context: IPeripheralContext) extends IHostedPeriphera
     signature map (_ + context.world.rand.nextGaussian() * noise) map double2Double toArray
   }
 
-  private def sendParticlePacket(x: Double, y: Double, z: Double, dimension: Int) = {
+  private def sendParticlePacket(x: Double, y: Double, z: Double, dimension: Int) {
     try {
       val baos = new ByteArrayOutputStream(24)
       val dos = new DataOutputStream(baos)

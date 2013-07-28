@@ -7,7 +7,7 @@ import org.lwjgl.opengl.GL11
 import net.minecraft.block.Block
 
 abstract class DefaultInventoryBlockRenderingHandler extends ISimpleBlockRenderingHandler {
-  def renderInventoryBlock(block: Block, metadata: Int, modelID: Int, renderer: RenderBlocks) = {
+  def renderInventoryBlock(block: Block, metadata: Int, modelID: Int, renderer: RenderBlocks) {
     val tessellator = Tessellator.instance;
     block.setBlockBoundsForItemRender()
     renderer.setRenderBoundsFromBlock(block)

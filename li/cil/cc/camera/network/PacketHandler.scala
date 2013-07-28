@@ -10,7 +10,7 @@ import net.minecraft.network.INetworkManager
 import net.minecraft.network.packet.Packet250CustomPayload
 
 class PacketHandler extends IPacketHandler {
-  def onPacketData(manager: INetworkManager, packet: Packet250CustomPayload, player: Player) = {
+  def onPacketData(manager: INetworkManager, packet: Packet250CustomPayload, player: Player) {
     try {
       val dis = new DataInputStream(new ByteArrayInputStream(packet.data))
       val x = dis.readDouble

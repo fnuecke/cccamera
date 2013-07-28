@@ -8,7 +8,7 @@ import li.cil.cc.camera.client.registry.CameraBlockRenderingHandler
 import li.cil.cc.camera.common.CommonProxy
 
 class ClientProxy extends CommonProxy {
-  override def init() = {
+  override def init() {
     super.init()
     Camera.Config.cameraBlockRenderID = RenderingRegistry.getNextAvailableRenderId()
     RenderingRegistry.registerBlockHandler(new CameraBlockRenderingHandler())

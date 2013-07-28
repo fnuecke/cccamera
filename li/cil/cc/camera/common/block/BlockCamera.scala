@@ -42,8 +42,7 @@ class BlockCamera extends Block(Camera.Config.cameraBlockID, Material.rock) {
   GameRegistry.registerBlock(this, "camera")
   GameRegistry.registerTileEntity(classOf[TileEntityCamera], "camera")
   setUnlocalizedName("cccp.camera")
-  // TODO add to ComputerCraft tab?
-  setCreativeTab(CreativeTabs.tabRedstone)
+  setCreativeTab(creativeTab)
   setLightOpacity(3)
 
   /*
@@ -96,7 +95,7 @@ class BlockCamera extends Block(Camera.Config.cameraBlockID, Material.rock) {
   // Block rotation
   // ----------------------------------------------------------------------- //
 
-  override def onBlockPlacedBy(world: World, x: Int, y: Int, z: Int, entity: EntityLiving, itemStack: ItemStack) = {
+  override def onBlockPlacedBy(world: World, x: Int, y: Int, z: Int, entity: EntityLiving, itemStack: ItemStack) {
     if (!world.isRemote) {
       val facing = MathHelper.floor_double(entity.rotationYaw * 4 / 360 + 0.5) & 3
       setRotation(world, x, y, z, facing)
@@ -134,5 +133,12 @@ class BlockCamera extends Block(Camera.Config.cameraBlockID, Material.rock) {
       }
     else
       false
+  }
+
+  private def creativeTab = try {
+    val cc = Class.forName("dan200.ComputerCraft")
+    cc.getDeclaredField("creativeTab").get(cc).asInstanceOf[CreativeTabs]
+  } catch {
+    case _: Throwable => CreativeTabs.tabRedstone
   }
 }
