@@ -1,5 +1,7 @@
 package li.cil.cc.camera.common.peripheral
 
+import java.io.ByteArrayOutputStream
+import java.io.DataOutputStream
 import java.nio.ByteBuffer
 import java.security.MessageDigest
 
@@ -8,10 +10,12 @@ import scala.util.Random
 
 import cpw.mods.fml.common.Mod
 import cpw.mods.fml.common.network.NetworkMod
+import cpw.mods.fml.common.network.PacketDispatcher
 import dan200.computer.api.IComputerAccess
 import dan200.computer.api.IHostedPeripheral
 import li.cil.cc.camera.Camera
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.network.packet.Packet250CustomPayload
 import net.minecraft.world.World
 import net.minecraftforge.common.ForgeDirection
 
@@ -131,9 +135,19 @@ class PeripheralCamera(val context: IPeripheralContext) extends IHostedPeriphera
     // specified. Let's hope this really ever only returns values in [0, 15].
     val maxLightLevel = 15
     val lightLevel =
-      if (flash && context.consumeFuel())
+      if (flash && context.consumeFuel()) {
+        if (Camera.Config.enableParticles) {
+          // Offset from ForgeDirection (down, up, north, south, west, east).
+          val dx = Array(0.25, -0.25, 0.5, -0.5)(dir.ordinal() - 2)
+          val dz = Array(0.5, -0.5, -0.25, 0.25)(dir.ordinal() - 2)
+          // Position of flash particle effect.
+          val fx = x + 0.5 + dx
+          val fy = y + 0.8
+          val fz = z + 0.5 + dz
+          sendParticlePacket(fx, fy, fz, context.world.getWorldInfo.getDimension)
+        }
         maxLightLevel
-      else
+      } else
         context.world.getBlockLightValue(context.x, context.y, context.z)
 
     // Adjust the light level to a range of [0, 1], to apply it to the original data.
@@ -177,5 +191,25 @@ class PeripheralCamera(val context: IPeripheralContext) extends IHostedPeriphera
 
     // Box the values to get an object array and return it.
     signature map (_ + context.world.rand.nextGaussian() * noise) map double2Double toArray
+  }
+
+  private def sendParticlePacket(x: Double, y: Double, z: Double, dimension: Int) = {
+    try {
+      val baos = new ByteArrayOutputStream(24)
+      val dos = new DataOutputStream(baos)
+      dos.writeDouble(x)
+      dos.writeDouble(y)
+      dos.writeDouble(z)
+
+      val packet = new Packet250CustomPayload();
+      packet.channel = "CCCPFlashPFX";
+      packet.data = baos.toByteArray;
+      packet.length = baos.size;
+
+      PacketDispatcher.sendPacketToAllInDimension(packet, dimension)
+    } catch {
+      // Make sure we don't break the game because of some particle...
+      case _: Throwable => {}
+    }
   }
 }

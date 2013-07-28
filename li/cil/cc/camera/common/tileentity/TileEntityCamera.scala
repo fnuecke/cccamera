@@ -1,10 +1,7 @@
 package li.cil.cc.camera.common.tileentity
 
-import scala.Array.canBuildFrom
-
 import dan200.computer.api.IComputerAccess
 import dan200.computer.api.IPeripheral
-import li.cil.cc.camera.Camera
 import li.cil.cc.camera.common.peripheral.IPeripheralContext
 import li.cil.cc.camera.common.peripheral.PeripheralCamera
 import net.minecraft.nbt.NBTTagCompound
@@ -64,9 +61,8 @@ class TileEntityCamera extends TileEntity with IPeripheral with IPeripheralConte
   def y: Int = yCoord
   def z: Int = zCoord
 
-  /** Camera looks to the front of the block (where the front texture is). */
-  def facing: ForgeDirection = ForgeDirection.getOrientation(Array(3, 2, 5, 4)(getBlockMetadata - 2)).getOpposite
+  def facing: ForgeDirection = ForgeDirection.getOrientation(getBlockMetadata)
 
-  /** No can do! */
+  /** No can do! We're a block, so we don't have fuel. Used to suppress flash for blocks. */
   def consumeFuel() = false
 }

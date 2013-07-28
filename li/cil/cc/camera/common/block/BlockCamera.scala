@@ -44,6 +44,7 @@ class BlockCamera extends Block(Camera.Config.cameraBlockID, Material.rock) {
   setUnlocalizedName("cccp.camera")
   // TODO add to ComputerCraft tab?
   setCreativeTab(CreativeTabs.tabRedstone)
+  setLightOpacity(3)
 
   /*
    * Assuming we use 16x16 textures, shrink the box down by two pixels in
@@ -61,6 +62,8 @@ class BlockCamera extends Block(Camera.Config.cameraBlockID, Material.rock) {
   override def getRenderType = Camera.Config.cameraBlockRenderID
 
   override def isOpaqueCube = false
+
+  override def renderAsNormalBlock = false
 
   override def getBlockTexture(block: IBlockAccess, x: Int, y: Int, z: Int, side: Int) = side match {
     case 0 | 1 => Icons.top
@@ -97,7 +100,6 @@ class BlockCamera extends Block(Camera.Config.cameraBlockID, Material.rock) {
     if (!world.isRemote) {
       val facing = MathHelper.floor_double(entity.rotationYaw * 4 / 360 + 0.5) & 3
       setRotation(world, x, y, z, facing)
-      world.setBlockMetadataWithNotify(x, y, z, Array(2, 5, 3, 4)(facing), 3)
     }
   }
 
@@ -114,9 +116,11 @@ class BlockCamera extends Block(Camera.Config.cameraBlockID, Material.rock) {
   }
 
   def rotation(world: IBlockAccess, x: Int, y: Int, z: Int) =
+    // Renderer(down, up, north, south, west, east) -> Facing(south, west, north, east) inverted.
     Array(0, 0, 0, 2, 3, 1)(world.getBlockMetadata(x, y, z))
 
   private def setRotation(world: World, x: Int, y: Int, z: Int, value: Int) =
+    // Facing(south, west, north, east) -> Renderer(down, up, north, south, west, east) inverted.
     world.setBlockMetadataWithNotify(x, y, z, Array(2, 5, 3, 4)((value + 4) % 4), 3)
 
   private def canWrench(player: EntityPlayer, x: Int, y: Int, z: Int) = {

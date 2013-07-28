@@ -14,8 +14,10 @@ import cpw.mods.fml.common.event.FMLInitializationEvent
 import cpw.mods.fml.common.event.FMLPostInitializationEvent
 import cpw.mods.fml.common.event.FMLPreInitializationEvent
 import cpw.mods.fml.common.network.NetworkMod
+import cpw.mods.fml.common.network.NetworkMod.SidedPacketHandler
 import li.cil.cc.camera.common.CommonProxy
 import li.cil.cc.camera.common.block.BlockCamera
+import li.cil.cc.camera.network.PacketHandler
 import net.minecraftforge.common.Configuration
 
 @Mod(modid = "CCCP",
@@ -23,7 +25,9 @@ import net.minecraftforge.common.Configuration
   version = "1.5.2.0",
   dependencies = "required-after:ComputerCraft;after:BuildCraft",
   modLanguage = "scala")
-@NetworkMod(clientSideRequired = true, serverSideRequired = false)
+@NetworkMod(clientSideRequired = true, serverSideRequired = false,
+  clientPacketHandlerSpec = new SidedPacketHandler(
+    channels = Array("CCCPFlashPFX"), packetHandler = classOf[PacketHandler]))
 object Camera {
   object Blocks {
     var camera: BlockCamera = null
@@ -36,6 +40,7 @@ object Camera {
     var minLightLevel = 6.0
     var cooldown = 1.0
     var enableSound = true
+    var enableParticles = true
 
     /** Automatically filled in in postInit. */
     var cameraBlockRenderID = 0
@@ -105,6 +110,10 @@ object Camera {
         "This can be useful because the sound when the camera is still on cooldown\n" +
         "is different than the one from when it isn't.").
       getBoolean(Config.enableSound)
+
+    Config.enableParticles = config.get("options", "enableParticles", Config.enableParticles,
+      "Whether to show a particle effect when the camera's flash is used.").
+      getBoolean(Config.enableParticles)
 
     config.save()
 
