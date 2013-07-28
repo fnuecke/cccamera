@@ -10,6 +10,13 @@ import net.minecraft.world.IBlockAccess
 
 /** Custom renderer so we can rotate the top texture. */
 class CameraBlockRenderingHandler extends DefaultInventoryBlockRenderingHandler {
+  override def renderInventoryBlock(block: Block, metadata: Int, modelID: Int, renderer: RenderBlocks) = {
+    val uvRotateTop = renderer.uvRotateTop
+    renderer.uvRotateTop = 2
+    val result = super.renderInventoryBlock(block, metadata, modelID, renderer)
+    renderer.uvRotateTop = uvRotateTop
+    result
+  }
   def renderWorldBlock(world: IBlockAccess, x: Int, y: Int, z: Int, block: Block, modelId: Int, renderer: RenderBlocks) = {
     val (uvRotateTop, uvRotateBottom) = (renderer.uvRotateTop, renderer.uvRotateBottom)
     renderer.uvRotateTop = Array(0, 1, 3, 2)(block.asInstanceOf[BlockCamera].rotation(world, x, y, z))

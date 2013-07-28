@@ -26,8 +26,15 @@ class CommonProxy {
       new ItemStack(Camera.Blocks.camera, 1),
       "SSS", "REG", "SSS",
       'S': Character, Block.stone,
-      'R': Character, Item.redstone,
+      'R': Character, computer,
       'E': Character, Item.spiderEye,
       'G': Character, Block.glass)
+  }
+  
+  private def computer = try {
+    val ccBlocks = Class.forName("dan200.ComputerCraft$Blocks")
+    ccBlocks.getDeclaredField("computer").get(ccBlocks).asInstanceOf[Block]
+  } catch {
+    case _: Throwable => Item.redstone
   }
 }

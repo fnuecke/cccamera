@@ -38,9 +38,9 @@ object Camera {
     var cameraBlockID = 3600
     var turtleUpgradeID = 253
     var hashSalt = "if you run a public server you may want to change this"
-    var minLightLevel = 6.0
+    var minLightLevel = 7.0
     var cooldown = 1.0
-    var minNoise = 0.3
+    var minNoise = 0.5
     var enableSound = true
     var enableParticles = true
 
@@ -67,7 +67,7 @@ object Camera {
     var hasSHA512 = true
 
     /** The noise introduced from being on cooldown (linearly shrinks during cooldown period). */
-    val noiseFromCooldown = 5
+    val noiseFromCooldown = 10
   }
 
   val logger = Logger.getLogger("CCCP")
