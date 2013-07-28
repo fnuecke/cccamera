@@ -39,6 +39,7 @@ object Camera {
     var hashSalt = "if you run a public server you may want to change this"
     var minLightLevel = 6.0
     var cooldown = 1.0
+    var minNoise = 0.3
     var enableSound = true
     var enableParticles = true
 
@@ -50,9 +51,6 @@ object Camera {
 
     /** The noise introduced from being on cooldown (linearly shrinks during cooldown period). */
     val noiseFromCooldown = 5
-
-    /** Minimum noise level, to not make things too easy. */
-    val minNoise = 0.2
   }
 
   val logger = Logger.getLogger("CCCP")
@@ -104,6 +102,10 @@ object Camera {
       "determine the true signature of a block. The minimum value is 0.1 to at\n" +
       "least discourage spamming it in a single tick.").
       getDouble(Config.cooldown) max 0.1
+
+    Config.minNoise = config.get("options", "minNoise", Config.minNoise,
+      "The base noise level to apply to all measurements. The minimum value is 0.1.").
+      getDouble(Config.minNoise) max 0.1
 
     Config.enableSound = config.get("options", "enableSound", Config.enableSound,
       "Whether to play a clicking sound when the camera is triggered.\n" +
