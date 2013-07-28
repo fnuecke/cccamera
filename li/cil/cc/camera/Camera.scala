@@ -18,6 +18,7 @@ import cpw.mods.fml.common.network.NetworkMod.SidedPacketHandler
 import li.cil.cc.camera.common.CommonProxy
 import li.cil.cc.camera.common.block.BlockCamera
 import li.cil.cc.camera.network.PacketHandler
+import net.minecraft.block.Block
 import net.minecraftforge.common.Configuration
 
 @Mod(modid = "CCCP",
@@ -42,6 +43,22 @@ object Camera {
     var minNoise = 0.3
     var enableSound = true
     var enableParticles = true
+
+    /** A list of blocks for which we will only return noise. */
+    var blacklisted = Set(
+      0, /* Air */
+      Block.waterMoving.blockID,
+      Block.waterStill.blockID,
+      Block.lavaMoving.blockID,
+      Block.lavaStill.blockID,
+      Block.leaves.blockID,
+      Block.glass.blockID,
+      Block.fire.blockID,
+      Block.ice.blockID,
+      Block.portal.blockID,
+      Block.thinGlass.blockID,
+      Block.endPortal.blockID,
+      Block.tripWire.blockID)
 
     /** Automatically filled in in postInit. */
     var cameraBlockRenderID = 0
@@ -117,7 +134,16 @@ object Camera {
       "Whether to show a particle effect when the camera's flash is used.").
       getBoolean(Config.enableParticles)
 
-    config.save()
+    Config.blacklisted = config.get("options", "blackisted", Config.blacklisted.toArray.sortWith(_ < _), "" +
+      "A list of blacklisted block IDs. For these the camera will always return\n" +
+      "pure noise. The default list is built on the principle that transparent\n" +
+      "blocks (such as air and glass) cannot be properly captured, and that\n" +
+      "fully animated blocks (flowing water, fire) cannot produce a robust\n" +
+      "signal, since they always change.")
+      .getIntList().toSet
+
+    if (config.hasChanged)
+      config.save()
 
     // See if SHA512 is available, which is what we preferably use to hash block IDs.
     try {

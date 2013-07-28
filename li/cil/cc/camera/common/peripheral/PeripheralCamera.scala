@@ -103,8 +103,10 @@ class PeripheralCamera(val context: IPeripheralContext) extends IHostedPeriphera
 
     // Hash the block ID and metadata it into a byte array (length of 64) using
     // the world seed and configurable hash as salt.
-    val hash = (Camera.Config.hasSHA512 match {
-      case true => {
+    val hash =
+      if (Camera.Config.blacklisted(id))
+        Array.fill[Byte](64)(0)
+      else if (Camera.Config.hasSHA512) {
         // Try to use SHA512, using the world seed and configurable value as salt.
         val digest = MessageDigest.getInstance("SHA-512")
         digest.reset()
@@ -112,8 +114,7 @@ class PeripheralCamera(val context: IPeripheralContext) extends IHostedPeriphera
         digest.update(Camera.Config.hashSalt.getBytes("UTF-8"))
         digest.update(ByteBuffer.allocate(4).putInt(meta).array)
         digest.digest(ByteBuffer.allocate(4).putInt(id).array)
-      }
-      case false => {
+      } else {
         // We don't have SHA-512 available, fall back to random based weak version.
         // Use the configurable salt and hash it up with the world seed and block ID.
         def hash(seed: Long, value: Int) = seed * 31 + value
@@ -129,7 +130,6 @@ class PeripheralCamera(val context: IPeripheralContext) extends IHostedPeriphera
         new Random(seed).nextBytes(result)
         result
       }
-    })
 
     // Get the absolute light level at the camera's position. Apply flash if
     // specified. Let's hope this really ever only returns values in [0, 15].
