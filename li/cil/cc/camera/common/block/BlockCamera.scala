@@ -10,6 +10,7 @@ import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.texture.IconRegister
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.entity.EntityLiving
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.util.Icon
 import net.minecraft.util.MathHelper
@@ -57,6 +58,8 @@ class BlockCamera extends Block(Camera.Config.cameraBlockID, Material.rock) {
   // Rendering stuff
   // ----------------------------------------------------------------------- //
 
+  override def getRenderType = Camera.Config.cameraBlockRenderID
+
   override def isOpaqueCube = false
 
   override def getBlockTexture(block: IBlockAccess, x: Int, y: Int, z: Int, side: Int) = side match {
@@ -92,51 +95,40 @@ class BlockCamera extends Block(Camera.Config.cameraBlockID, Material.rock) {
 
   override def onBlockPlacedBy(world: World, x: Int, y: Int, z: Int, entity: EntityLiving, itemStack: ItemStack) = {
     if (!world.isRemote) {
-      val dir = MathHelper.floor_double(entity.rotationYaw * 4 / 360 + 0.5) & 3
-      world.setBlockMetadataWithNotify(x, y, z, Array(2, 5, 3, 4)(dir), 3)
+      val facing = MathHelper.floor_double(entity.rotationYaw * 4 / 360 + 0.5) & 3
+      setRotation(world, x, y, z, facing)
+      world.setBlockMetadataWithNotify(x, y, z, Array(2, 5, 3, 4)(facing), 3)
     }
   }
 
   override def getValidRotations(world: World, x: Int, y: Int, z: Int) =
     Array(ForgeDirection.SOUTH, ForgeDirection.WEST, ForgeDirection.NORTH, ForgeDirection.EAST)
 
-  // ----------------------------------------------------------------------- //
-  // Debugging
-  // ----------------------------------------------------------------------- //
+  override def onBlockActivated(world: World, x: Int, y: Int, z: Int, player: EntityPlayer,
+    side: Int, hitX: Float, hitY: Float, hitZ: Float) = {
+    if (canWrench(player, x, y, z)) {
+      val delta = if (player.isSneaking()) 1 else -1
+      setRotation(world, x, y, z, rotation(world, x, y, z) + delta)
+    } else
+      false
+  }
 
-//  override def onBlockActivated(world: World, x: Int, y: Int, z: Int,
-//    player: net.minecraft.entity.player.EntityPlayer, side: Int,
-//    hitX: Float, hitY: Float, hitZ: Float) = {
-//    if (player.isSneaking()) {
-//      false
-//    } else {
-//      if (!world.isRemote) {
-//        val reps = 64
-//        val tileEntity = world.getBlockTileEntity(x, y, z).asInstanceOf[TileEntityCamera]
-//        val signatures = 1 to reps map (_ => tileEntity.callMethod(null, 0, null)(43).asInstanceOf[Double])
-//        
-//        val avg = (0.0 /: signatures)(_ + _) / reps
-//        println("avg: ", avg)
-//        
-//        val delta = signatures map (_ - avg)
-//        val avgdelta = (0.0 /: delta)(_ + _) / reps
-//        val absdelta = delta map Math.abs
-//        val avgabsdelta = (0.0 /: absdelta)(_+_)/reps
-//        
-//        
-//        println("min/max/avg/avgabs delta: ", absdelta min, absdelta max, avgdelta, avgabsdelta)
-//        
-//
-//        //val avg = signatures.map(_.getBytes("UTF-8")).foldLeft(Array.fill(64)(0))((a, b) => a zip b map (x => x._1 + x._2)) map (_ / 100) map (_.toChar)
-////        val avg = (Seq.fill(64)(0.0) /: signatures)((a, b) => a zip b map (x => x._1 + x._2)) map (_ / reps)
-////
-////        val deltamaxs = (Seq.fill(64)(0.0) /: signatures)((a, b) => avg zip b map (x => Math.abs(x._1 - x._2)) zip a map (x => Math.max(x._1, x._2)))
-////        val deltaavgs = (Seq.fill(64)(0.0) /: signatures)((a, b) => avg zip b map (x => Math.abs(x._1 - x._2)) zip a map (x => x._1 + x._2)) map (_ / reps)
-////        println(deltaavgs.length)
-////        val deltaavg = (0.0 /: deltaavgs)(_ + _) / 64
-////        println("avg/min/max delta: ", deltaavg, deltamaxs min, deltamaxs max)
-//      }
-//      true
-//    }
-//  }
+  def rotation(world: IBlockAccess, x: Int, y: Int, z: Int) =
+    Array(0, 0, 0, 2, 3, 1)(world.getBlockMetadata(x, y, z))
+
+  private def setRotation(world: World, x: Int, y: Int, z: Int, value: Int) =
+    world.setBlockMetadataWithNotify(x, y, z, Array(2, 5, 3, 4)((value + 4) % 4), 3)
+
+  private def canWrench(player: EntityPlayer, x: Int, y: Int, z: Int) = {
+    if (player.getCurrentEquippedItem() != null)
+      try {
+        player.getCurrentEquippedItem().getItem().asInstanceOf[{
+          def canWrench(player: EntityPlayer, x: Int, y: Int, z: Int): Boolean
+        }].canWrench(player, x, y, z)
+      } catch {
+        case e: Throwable => false
+      }
+    else
+      false
+  }
 }

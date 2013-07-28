@@ -157,8 +157,7 @@ class PeripheralCamera(val context: IPeripheralContext) extends IHostedPeriphera
     val cooldownInTicks = 20.0 * Camera.Config.cooldown
     val timePassed = context.world.getTotalWorldTime() - lastTrigger
     val relativeCooldownRemaining = Math.max(1 - timePassed / cooldownInTicks, 0)
-    val noiseFromCooldown = 5.0 // Fixed, large value.
-    val cooldownInducedNoise = relativeCooldownRemaining * noiseFromCooldown
+    val cooldownInducedNoise = relativeCooldownRemaining * Camera.Config.noiseFromCooldown
 
     // Play a sound effect when we're triggered, if we're allowed to.
     if (Camera.Config.enableSound)
@@ -174,8 +173,7 @@ class PeripheralCamera(val context: IPeripheralContext) extends IHostedPeriphera
 
     // Compute the complete noise scaling to be used on the random numbers. We
     // enforce some minimum noise to avoid making things too easy ;)
-    val minimalNoise = 0.1
-    val noise = Math.max(generalNoise + cooldownInducedNoise, minimalNoise)
+    val noise = Math.max(generalNoise + cooldownInducedNoise, Camera.Config.minNoise)
 
     // Box the values to get an object array and return it.
     signature map (_ + context.world.rand.nextGaussian() * noise) map double2Double toArray

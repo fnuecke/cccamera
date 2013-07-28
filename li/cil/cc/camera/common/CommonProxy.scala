@@ -13,7 +13,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.item.crafting.CraftingManager
 
 class CommonProxy {
-  def init() = {
+  def init(): Unit = {
     Camera.Blocks.camera = new BlockCamera
     LanguageRegistry.addName(Camera.Blocks.camera, "Camera")
     if (Camera.Config.turtleUpgradeID > 0) {
@@ -21,7 +21,7 @@ class CommonProxy {
     }
   }
 
-  def postInit() = {
+  def postInit(): Unit = {
     CraftingManager.getInstance().addRecipe(
       new ItemStack(Camera.Blocks.camera, 1),
       "SSS", "REG", "SSS",

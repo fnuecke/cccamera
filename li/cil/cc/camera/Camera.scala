@@ -2,8 +2,13 @@ package li.cil.cc.camera
 
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
+import java.util.logging.Logger
+
 import cpw.mods.fml.common.FMLLog
 import cpw.mods.fml.common.Mod
+import cpw.mods.fml.common.Mod.Init
+import cpw.mods.fml.common.Mod.PostInit
+import cpw.mods.fml.common.Mod.PreInit
 import cpw.mods.fml.common.SidedProxy
 import cpw.mods.fml.common.event.FMLInitializationEvent
 import cpw.mods.fml.common.event.FMLPostInitializationEvent
@@ -12,15 +17,11 @@ import cpw.mods.fml.common.network.NetworkMod
 import li.cil.cc.camera.common.CommonProxy
 import li.cil.cc.camera.common.block.BlockCamera
 import net.minecraftforge.common.Configuration
-import cpw.mods.fml.common.Mod.PostInit
-import cpw.mods.fml.common.Mod.PreInit
-import cpw.mods.fml.common.Mod.Init
-import java.util.logging.Logger
 
 @Mod(modid = "CCCP",
   name = "ComputerCraft Camera Peripheral",
   version = "1.5.2.0",
-  dependencies = "required-after:ComputerCraft",
+  dependencies = "required-after:ComputerCraft;after:BuildCraft",
   modLanguage = "scala")
 @NetworkMod(clientSideRequired = true, serverSideRequired = false)
 object Camera {
@@ -35,7 +36,18 @@ object Camera {
     var minLightLevel = 6.0
     var cooldown = 1.0
     var enableSound = true
+
+    /** Automatically filled in in postInit. */
+    var cameraBlockRenderID = 0
+
+    /** Automatically filled in once to avoid unnecessary exceptions when hashing. */
     var hasSHA512 = true
+
+    /** The noise introduced from being on cooldown (linearly shrinks during cooldown period). */
+    val noiseFromCooldown = 5
+
+    /** Minimum noise level, to not make things too easy. */
+    val minNoise = 0.2
   }
 
   val logger = Logger.getLogger("CCCP")
@@ -43,7 +55,7 @@ object Camera {
 
   /** No distinction for now. May come later if I decide to play with advanced rendering. */
   @SidedProxy(
-    clientSide = "li.cil.cc.camera.common.CommonProxy",
+    clientSide = "li.cil.cc.camera.client.ClientProxy",
     serverSide = "li.cil.cc.camera.common.CommonProxy")
   var proxy: CommonProxy = null
 

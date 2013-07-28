@@ -44,6 +44,8 @@ a snapshot of the same block, over and over, and slowly get a stable average, wh
 
 The returned numbers are influenced by some random noise and the light level at the camera position. While the noise is of constant strength (think of it as film grain), the light level determines the strength of the underlying true signature.
 
+Camera blocks can be rotated using any BuildCraft compatible wrench.
+
 Considerations
 ==============
 
@@ -74,7 +76,6 @@ Plans
 
 All of these may or may not happen.
 
-- Make the camera block wrenchable.
 - Add some particle / lighting effect when the flash is used.
 - Create a nicer block model.
 - Inspect items in a turtle's inventory if and only if it is standing directly in front of a camera block (or next to another turtle with the camera upgrade).
