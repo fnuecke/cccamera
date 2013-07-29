@@ -30,7 +30,7 @@ class CommonProxy {
       'E': Character, Item.spiderEye,
       'G': Character, Block.glass)
   }
-  
+
   private def computer = try {
     val ccBlocks = Class.forName("dan200.ComputerCraft$Blocks")
     ccBlocks.getDeclaredField("computer").get(ccBlocks).asInstanceOf[Block]

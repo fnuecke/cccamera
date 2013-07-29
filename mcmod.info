@@ -1,9 +1,9 @@
 [
 {
-"modid": "CCCP",
-"name": "ComputerCraft Camera Peripheral",
-"description": "Pseudo cameras for ComputerCraft computers and turtles. You won't get pictures. Instead it simulates output from the nerves of a spider's eye, which is much more awesome! Seriously.",
-"version": "1.5.2.0",
-"authors": ["Sangar"]
+  "modid": "CCCP",
+  "name": "ComputerCraft Camera Peripheral",
+  "version": "1.5.2.0",
+  "authors": ["Sangar"],
+  "description": "Pseudo cameras for ComputerCraft computers and turtles. You won't get pictures. Instead it simulates output from the nerves of a spider's eye, which is much more awesome! Seriously."
 }
 ]

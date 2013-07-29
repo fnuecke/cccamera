@@ -77,10 +77,10 @@ class BlockCamera extends Block(Camera.Config.cameraBlockID, Material.rock) {
   }
 
   override def registerIcons(register: IconRegister) = {
-    Icons.front = register.registerIcon("CCCP:camera")
-    Icons.side = register.registerIcon("CCCP:cameraSide")
-    Icons.top = register.registerIcon("CCCP:cameraTop")
-    Icons.turtle = register.registerIcon("CCCP:cameraTurtle")
+    Icons.front = register.registerIcon("cccp:camera")
+    Icons.side = register.registerIcon("cccp:cameraSide")
+    Icons.top = register.registerIcon("cccp:cameraTop")
+    Icons.turtle = register.registerIcon("cccp:cameraTurtle")
   }
 
   // ----------------------------------------------------------------------- //
