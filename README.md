@@ -48,7 +48,7 @@ Camera blocks can be rotated using any BuildCraft compatible wrench.
 Considerations
 ==============
 
-The main concerns I had when designing this were the thing not getting too overpowered, nor it feeling totally out of place. Originally I just wanted something that could identify blocks on the go (the peripherals that probably can seem to be stuck at MC 1.4.x), because carrying around five blocks when digging just to avoid the uninteresting stuff really really s... ssseems not so great. But simply getting the ID of a block was out of the question for me, since that would be just a bit too easy, and - as often mentioned on the ComputerCraft forum - breaks the 4th wall pretty damn hard (then again, http API anyone?)
+The main concerns I had when designing this were the thing getting too overpowered, nor it feeling totally out of place. Originally I just wanted something that could identify blocks on the go (the peripherals that probably can seem to be stuck at MC 1.4.x), because carrying around five blocks when digging just to avoid the uninteresting stuff really really s... ssseems not so great. But simply getting the ID of a block was out of the question for me, since that would be just a bit too easy, and - as often mentioned on the ComputerCraft forum - breaks the 4th wall pretty damn hard (then again, http API anyone?)
 
 So I set out to make up some limitations that felt natural and intuitive in the context of the world. Here's what I came up with:
 
